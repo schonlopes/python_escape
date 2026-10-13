@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PYTHON ESCAPE — O CÓDIGO PERDIDO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <script src="config.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-space-900 text-gray-100 font-sans min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-cyber-cyan selection:text-space-900">
+
+    <audio id="game-soundtrack" src="controlled-tension.mp3" preload="auto" loop></audio>
+    <header class="border-b border-cyber-cyan/30 bg-space-800/80 backdrop-blur-md sticky top-0 z-50 px-4 py-3 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg border border-cyber-cyan bg-space-900/80 flex items-center justify-center text-cyber-cyan shadow-neon-cyan">
+                    <i class="fa-solid fa-microchip text-xl animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="font-mono font-bold text-lg tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-blue-400 to-cyber-purple">
+                        PYTHON ESCAPE
+                    </h1>
+                    <p class="text-xs text-cyber-cyan/70 font-mono tracking-widest uppercase">O CÓDIGO PERDIDO v2042.8</p>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div id="top-stats-bar" class="hidden md:flex items-center gap-6 font-mono text-sm">
+                <div class="flex items-center gap-2 bg-space-900/60 px-3 py-1.5 rounded-md border border-cyber-cyan/20">
+                    <i class="fa-solid fa-graduation-cap text-cyber-cyan"></i>
+                    <span class="text-gray-400">Estudante:</span>
+                    <span id="header-operator" class="text-cyber-cyan font-bold">---</span>
+                </div>
+                <div class="flex items-center gap-2 bg-space-900/60 px-3 py-1.5 rounded-md border border-cyber-purple/20">
+                    <i class="fa-solid fa-bolt text-cyber-purple"></i>
+                    <span class="text-gray-400">XP:</span>
+                    <span id="header-xp" class="text-cyber-purple font-bold">0</span>
+                </div>
+                <div class="flex items-center gap-2 bg-space-900/60 px-3 py-1.5 rounded-md border border-cyber-green/20">
+                    <i class="fa-solid fa-clock text-cyber-green"></i>
+                    <span id="header-timer" class="text-cyber-green font-bold">00:00</span>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex items-center gap-2">
+                <button id="btn-toggle-sound" onclick="toggleAudio()" class="w-10 h-10 rounded-lg border border-gray-700 bg-space-900 hover:border-cyber-cyan text-gray-300 hover:text-cyber-cyan flex items-center justify-center transition-all" title="Alternar Áudio">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+                <label class="music-volume no-print" title="Volume da trilha sonora"><i class="fa-solid fa-music"></i><input id="music-volume" type="range" min="0" max="100" value="25" aria-label="Volume da trilha sonora"></label>
+                <button id="btn-reset-game" onclick="confirmResetGame()" class="w-10 h-10 rounded-lg border border-gray-700 bg-space-900 hover:border-cyber-red text-gray-300 hover:text-cyber-red flex items-center justify-center transition-all" title="Reiniciar Progresso">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center relative">
+        <div class="absolute inset-0 scanline-overlay pointer-events-none opacity-20"></div>
+
+        <!-- CUSTOM MODAL: RESET GAME CONFIRMATION -->
+        <div id="modal-reset" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-space-800 border border-cyber-red/50 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+                <div class="flex items-center gap-3 text-cyber-red">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl animate-pulse"></i>
+                    <h3 class="font-mono font-bold text-lg text-white">REINICIAR PROGRESSO?</h3>
+                </div>
+                <p class="text-sm font-sans text-gray-300">
+                    Esta ação apagará todo o seu progresso salvo, XP, tempo e conquistas obtidas. Deseja reiniciar a missão?
+                </p>
+                <div class="flex gap-3 justify-end pt-2 font-mono">
+                    <button onclick="closeResetModal()" class="px-4 py-2 rounded-xl text-xs border border-gray-700 bg-space-900 text-gray-300 hover:text-white transition-all">
+                        CANCELAR
+                    </button>
+                    <button onclick="executeResetGame()" class="px-4 py-2 rounded-xl text-xs font-bold bg-cyber-red text-white hover:bg-red-600 transition-all shadow-neon-red">
+                        SIM, REINICIAR
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CERTIFICADO ORIGINAL: fundo do PDF anexado, somente campos variáveis sobrepostos -->
+        <div id="modal-certificate" class="hidden fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 overflow-y-auto">
+          <div class="bg-space-800 border border-cyber-purple/60 rounded-2xl p-4 max-w-5xl w-full space-y-4 my-auto">
+            <div class="flex justify-between items-center no-print">
+              <h3 class="font-mono font-bold text-white">CERTIFICADO DE CONCLUSÃO</h3>
+              <button onclick="closeCertificateModal()" class="text-gray-300 hover:text-white" aria-label="Fechar">✕</button>
+            </div>
+            <img id="cert-preview" alt="Certificado personalizado conforme o modelo original" class="w-full h-auto bg-white" />
+            <div class="flex justify-end gap-3 no-print">
+              <button onclick="printOriginalCertificate()" class="py-2.5 px-5 rounded-xl font-mono text-xs font-bold bg-cyber-green text-space-900">IMPRIMIR / SALVAR PDF</button>
+              <button onclick="closeCertificateModal()" class="py-2.5 px-5 rounded-xl font-mono text-xs border border-gray-600">FECHAR</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCREEN 1: CINEMATIC INTRO & OPERATOR LOGIN -->
+        <section id="screen-intro" class="screen-view max-w-3xl mx-auto w-full">
+            <div class="bg-space-800/90 border border-cyber-cyan/40 rounded-2xl p-6 md:p-8 shadow-2xl shadow-cyber-cyan/10 relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-60 h-60 bg-cyber-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- NEXUS Avatar Visualizer -->
+                <div class="flex flex-col items-center text-center mb-6">
+                    <div id="intro-nexus-avatar" class="w-28 h-28 rounded-full border-2 border-cyber-cyan bg-space-900 flex items-center justify-center nexus-orb relative mb-4 shadow-neon-cyan">
+                        <i class="fa-solid fa-brain text-5xl text-cyber-cyan"></i>
+                        <div class="absolute inset-0 rounded-full border border-cyber-cyan/30 animate-ping opacity-30"></div>
+                    </div>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-cyber-cyan/10 border border-cyber-cyan/40 text-cyber-cyan mb-2">
+                        <i class="fa-solid fa-signal mr-1 animate-pulse"></i> SINAL DA NEXUS RECEBIDO
+                    </span>
+                    <h2 class="text-2xl md:text-3xl font-bold font-mono text-white">SISTEMA INTELIGENTE DE DADOS NEXUS</h2>
+                </div>
+
+                <!-- Terminal Dialogue Box -->
+                <div class="bg-space-900 border border-cyber-cyan/30 rounded-xl p-5 font-mono text-sm md:text-base leading-relaxed text-cyber-cyan mb-6 min-h-[160px] flex flex-col justify-center relative">
+                    <div id="intro-typewriter-text" class="space-y-2"></div>
+                    <div id="typing-cursor" class="inline-block w-2.5 h-5 bg-cyber-cyan animate-pulse ml-1 align-middle"></div>
+                </div>
+
+                <!-- Operator Registration Form -->
+                <div id="intro-login-box" class="hidden transition-all duration-500 opacity-0 transform translate-y-4">
+                    <label for="operator-input" class="block font-mono text-xs uppercase tracking-widest text-gray-400 mb-2">
+                        <i class="fa-solid fa-user-graduate text-cyber-purple mr-1"></i> Digite seu Nome Completo:
+                    </label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="operator-input" placeholder="Ex: Ana Clara Silva" maxlength="50" 
+                               class="flex-grow bg-space-900 border border-cyber-purple/50 rounded-xl px-4 py-3 font-mono text-white placeholder-gray-600 focus:outline-none focus:border-cyber-cyan focus:ring-2 focus:ring-cyber-cyan/30 text-lg">
+                        <button onclick="startGameWithOperator()" class="bg-gradient-to-r from-cyber-cyan to-blue-600 hover:from-blue-500 hover:to-cyber-cyan text-space-900 font-bold font-mono px-8 py-3 rounded-xl transition-all shadow-neon-cyan flex items-center justify-center gap-2 text-lg">
+                            INICIAR MISSÃO <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 font-mono">Digite seu nome completo conforme constará no seu Certificado Oficial de Conclusão.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: CONTROL CENTER HUB -->
+        <section id="screen-hub" class="screen-view hidden w-full space-y-6">
+            <!-- Nexus Status Banner -->
+            <div class="bg-space-800/90 border border-cyber-cyan/30 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center gap-6">
+                <div id="hub-nexus-avatar" class="w-24 h-24 rounded-full border-2 border-cyber-cyan bg-space-900 flex-shrink-0 flex items-center justify-center nexus-orb relative shadow-neon-cyan">
+                    <i id="hub-nexus-icon" class="fa-solid fa-brain text-4xl text-cyber-cyan"></i>
+                </div>
+                <div class="flex-grow text-center md:text-left">
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-2">
+                        <span id="nexus-status-badge" class="px-3 py-1 rounded-full text-xs font-mono bg-cyber-red/20 border border-cyber-red text-cyber-red">
+                            ESTADO: MÓDULOS CORROMPIDOS
+                        </span>
+                        <span class="px-3 py-1 rounded-full text-xs font-mono bg-space-900 border border-gray-700 text-gray-300">
+                            PROGRESOS: <span id="hub-progress-percent" class="text-cyber-cyan font-bold">0%</span>
+                        </span>
+                    </div>
+                    <h2 class="text-xl md:text-2xl font-bold font-mono text-white mb-1">PAINEL CENTRAL DA NEXUS</h2>
+                    <p id="hub-nexus-dialogue" class="text-sm font-mono text-gray-300">
+                        "Operador, meus subsistemas estão inacessíveis. Complete os desafios para restaurar a integridade da IA."
+                    </p>
+                </div>
+                <!-- Mini Progress Bar -->
+                <div class="w-full md:w-48 flex-shrink-0 space-y-2">
+                    <div class="flex justify-between text-xs font-mono text-gray-400">
+                        <span>RESTAURAÇÃO</span>
+                        <span id="hub-restoration-text">0/10</span>
+                    </div>
+                    <div class="w-full h-3 bg-space-900 rounded-full border border-gray-700 overflow-hidden">
+                        <div id="hub-progress-bar" class="h-full bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-green w-0 transition-all duration-700"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modules Selection Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Module 1 -->
+                <div id="card-mod-1" class="bg-space-800/80 border border-cyber-cyan/40 rounded-2xl p-6 flex flex-col justify-between relative group hover:border-cyber-cyan transition-all shadow-lg">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <span class="w-12 h-12 rounded-xl bg-cyber-cyan/10 border border-cyber-cyan flex items-center justify-center text-cyber-cyan text-xl font-bold font-mono">
+                                M1
+                            </span>
+                            <span id="mod-1-status" class="text-xs font-mono px-2.5 py-1 rounded-full bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan">
+                                DISPONÍVEL
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold font-mono text-white group-hover:text-cyber-cyan transition-colors">MEMÓRIA DE DADOS</h3>
+                            <p class="text-xs text-gray-400 mt-1">Variáveis, saída com print(), tipos de dados (str, int, float) e entrada de dados.</p>
+                        </div>
+                        <div class="text-xs font-mono text-gray-400 space-y-1">
+                            <div class="flex justify-between"><span>Desafios:</span><span id="mod-1-count" class="text-cyber-cyan font-bold">0/3</span></div>
+                        </div>
+                    </div>
+                    <button onclick="enterModule(1)" id="mod-1-btn" class="mt-6 w-full py-2.5 rounded-xl font-mono text-sm font-bold bg-cyber-cyan text-space-900 hover:bg-white transition-all shadow-neon-cyan">
+                        ACESSAR MÓDULO
+                    </button>
+                </div>
+
+                <!-- Module 2 -->
+                <div id="card-mod-2" class="bg-space-800/40 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between relative group opacity-60 transition-all shadow-lg">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <span class="w-12 h-12 rounded-xl bg-cyber-blue/10 border border-cyber-blue flex items-center justify-center text-cyber-blue text-xl font-bold font-mono">
+                                M2
+                            </span>
+                            <span id="mod-2-status" class="text-xs font-mono px-2.5 py-1 rounded-full bg-gray-800 border border-gray-700 text-gray-500">
+                                <i class="fa-solid fa-lock text-xs mr-1"></i> BLOQUEADO
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold font-mono text-white">NÚCLEO DE PROCESSAMENTO</h3>
+                            <p class="text-xs text-gray-400 mt-1">Operações matemáticas (+, -, *, /), precedência, parênteses e arredondamento.</p>
+                        </div>
+                        <div class="text-xs font-mono text-gray-400 space-y-1">
+                            <div class="flex justify-between"><span>Desafios:</span><span id="mod-2-count" class="text-gray-500 font-bold">0/3</span></div>
+                        </div>
+                    </div>
+                    <button onclick="enterModule(2)" id="mod-2-btn" disabled class="mt-6 w-full py-2.5 rounded-xl font-mono text-sm font-bold bg-gray-800 text-gray-500 cursor-not-allowed transition-all">
+                        BLOQUEADO
+                    </button>
+                </div>
+
+                <!-- Module 3 -->
+                <div id="card-mod-3" class="bg-space-800/40 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between relative group opacity-60 transition-all shadow-lg">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <span class="w-12 h-12 rounded-xl bg-cyber-purple/10 border border-cyber-purple flex items-center justify-center text-cyber-purple text-xl font-bold font-mono">
+                                M3
+                            </span>
+                            <span id="mod-3-status" class="text-xs font-mono px-2.5 py-1 rounded-full bg-gray-800 border border-gray-700 text-gray-500">
+                                <i class="fa-solid fa-lock text-xs mr-1"></i> BLOQUEADO
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold font-mono text-white">SISTEMA DE DECISÕES</h3>
+                            <p class="text-xs text-gray-400 mt-1">Comparadores (==, &gt;, &lt;), condicionais (if, elif, else), indentação e fluxogramas.</p>
+                        </div>
+                        <div class="text-xs font-mono text-gray-400 space-y-1">
+                            <div class="flex justify-between"><span>Desafios:</span><span id="mod-3-count" class="text-gray-500 font-bold">0/3</span></div>
+                        </div>
+                    </div>
+                    <button onclick="enterModule(3)" id="mod-3-btn" disabled class="mt-6 w-full py-2.5 rounded-xl font-mono text-sm font-bold bg-gray-800 text-gray-500 cursor-not-allowed transition-all">
+                        BLOQUEADO
+                    </button>
+                </div>
+            </div>
+
+            <!-- Secret Challenge Card -->
+            <div id="card-mod-secret" class="bg-space-800/30 border border-gray-800 rounded-2xl p-6 relative overflow-hidden transition-all opacity-50">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-cyber-orange/10 border border-cyber-orange flex items-center justify-center text-cyber-orange text-2xl">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-mono text-cyber-orange uppercase tracking-wider font-bold">DESAFIO SECRETO INTEGRADOR</span>
+                            <h3 class="text-lg font-bold font-mono text-white">PROTOCOLO FINAL DE RESTAURAÇÃO</h3>
+                            <p class="text-xs text-gray-400">Combine variáveis, cálculos e estrutura decisional em um classificador completo.</p>
+                        </div>
+                    </div>
+                    <button id="mod-secret-btn" onclick="enterSecretProtocol()" disabled class="px-6 py-3 rounded-xl font-mono text-sm font-bold bg-gray-800 text-gray-500 cursor-not-allowed">
+                        <i class="fa-solid fa-lock mr-2"></i> REQUER OS 3 MÓDULOS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Badges Bar -->
+            <div class="bg-space-800/80 border border-gray-800 rounded-2xl p-5">
+                <h4 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">
+                    <i class="fa-solid fa-trophy text-cyber-orange mr-1"></i> Conquistas Desbloqueadas:
+                </h4>
+                <div id="badges-container" class="flex flex-wrap gap-3"></div>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: CHALLENGE VIEW INTERFACE -->
+        <section id="screen-challenge" class="screen-view hidden w-full max-w-5xl mx-auto space-y-4">
+            <!-- Challenge Header Bar -->
+            <div class="bg-space-800/90 border border-cyber-cyan/30 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="returnToHub()" class="px-3 py-1.5 rounded-lg border border-gray-700 bg-space-900 text-xs font-mono text-gray-300 hover:text-cyber-cyan hover:border-cyber-cyan transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-left"></i> VOLTAR AO PAINEL
+                    </button>
+                    <span id="challenge-module-tag" class="text-xs font-mono font-bold px-2.5 py-1 rounded-md bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/40">
+                        MÓDULO 1
+                    </span>
+                    <h3 id="challenge-title" class="font-mono font-bold text-white text-base md:text-lg">Desafio 1.1</h3>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="challenge-xp-badge" class="text-xs font-mono px-2.5 py-1 rounded-md bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/40 font-bold">
+                        +100 XP
+                    </span>
+                    <button onclick="requestHint()" id="btn-hint" class="px-3 py-1.5 rounded-lg border border-cyber-orange/40 bg-cyber-orange/10 text-cyber-orange hover:bg-cyber-orange/20 text-xs font-mono transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-lightbulb"></i> DICA (<span id="hint-count-text">0/3</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hint Display Box -->
+            <div id="hint-box" class="hidden bg-cyber-orange/10 border border-cyber-orange/40 rounded-xl p-4 text-xs font-mono text-cyber-orange transition-all">
+                <div class="flex items-start gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-base flex-shrink-0 mt-0.5"></i>
+                    <div>
+                        <span class="font-bold uppercase tracking-wider block mb-1">Dica de Suporte NEXUS:</span>
+                        <p id="hint-text"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Challenge Area Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Column: Context & Code Prompt -->
+                <div class="lg:col-col-span-12 lg:col-span-6 space-y-4">
+                    <div class="bg-space-800/80 border border-cyber-cyan/20 rounded-xl p-5 space-y-3">
+                        <h4 class="text-xs font-mono text-cyber-cyan uppercase tracking-wider font-bold">
+                            <i class="fa-solid fa-circle-info mr-1"></i> Instruções da Missão:
+                        </h4>
+                        <p id="challenge-instruction" class="text-sm text-gray-200 font-sans leading-relaxed"></p>
+                    </div>
+
+                    <!-- Code / Diagram Context Panel -->
+                    <div class="bg-space-900 border border-cyber-cyan/30 rounded-xl p-4 font-mono text-xs md:text-sm overflow-x-auto shadow-inner relative">
+                        <div class="flex justify-between items-center text-xs text-gray-500 border-b border-gray-800 pb-2 mb-3">
+                            <span><i class="fa-brands fa-python text-cyber-cyan mr-1"></i> codigo_nexus.py</span>
+                            <span id="challenge-difficulty-tag" class="text-cyber-green">FÁCIL</span>
+                        </div>
+                        <div id="challenge-code-snippet" class="text-gray-300 leading-relaxed font-mono whitespace-pre font-normal"></div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Resolver Engine -->
+                <div class="lg:col-span-6 flex flex-col justify-between space-y-4">
+                    <div id="interactive-workspace" class="bg-space-800/90 border border-cyber-cyan/30 rounded-xl p-5 flex-grow space-y-4">
+                        <!-- Content dynamically injected per challenge type -->
+                    </div>
+
+                    <!-- Submit & Feedback Bar -->
+                    <div class="space-y-3">
+                        <button id="btn-submit-solution" onclick="submitSolution()" class="w-full py-3 rounded-xl font-mono text-base font-bold bg-gradient-to-r from-cyber-cyan to-blue-600 hover:from-blue-500 hover:to-cyber-cyan text-space-900 transition-all shadow-neon-cyan flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> VALIDAR CÓDIGO & EXECUTAR
+                        </button>
+
+                        <div id="feedback-box" class="hidden rounded-xl p-4 font-mono text-xs md:text-sm border transition-all">
+                            <!-- Dynamic feedback message -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: VICTORY & FINAL REPORT -->
+        <section id="screen-report" class="screen-view hidden max-w-4xl mx-auto w-full space-y-6">
+            <div class="bg-space-800/90 border border-cyber-green/50 rounded-2xl p-6 md:p-8 shadow-2xl shadow-cyber-green/10 text-center space-y-6 relative overflow-hidden">
+                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-cyber-green/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="w-28 h-28 rounded-full border-2 border-cyber-green bg-space-900 mx-auto flex items-center justify-center nexus-orb relative shadow-neon-green">
+                    <i class="fa-solid fa-check-double text-5xl text-cyber-green animate-bounce"></i>
+                </div>
+
+                <div>
+                    <span class="inline-block px-4 py-1.5 rounded-full text-xs font-mono bg-cyber-green/20 border border-cyber-green text-cyber-green font-bold uppercase tracking-widest mb-2">
+                        SISTEMA NEXUS 100% RESTAURADO
+                    </span>
+                    <h2 class="text-2xl md:text-4xl font-bold font-mono text-white">PROTOCOLO CONCLUÍDO COM SUCESSO!</h2>
+                </div>
+
+                <div class="bg-space-900 border border-cyber-green/30 rounded-xl p-5 text-left font-mono text-xs md:text-sm text-cyber-green leading-relaxed">
+                    <p>"Obrigada, Estudante <span id="report-operator-name" class="font-bold underline text-white">---</span>. Você recuperou todos os meus módulos de dados, processamento e decisões. Agora sou capaz de operar em capacidade total!"</p>
+                </div>
+
+                <!-- Stats Summary Matrix -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
+                    <div class="bg-space-900 border border-gray-800 p-4 rounded-xl text-center">
+                        <span class="text-xs text-gray-400 block">PONTUAÇÃO XP</span>
+                        <span id="report-xp" class="text-2xl font-bold text-cyber-purple">0</span>
+                    </div>
+                    <div class="bg-space-900 border border-gray-800 p-4 rounded-xl text-center">
+                        <span class="text-xs text-gray-400 block">TEMPO TOTAL</span>
+                        <span id="report-time" class="text-2xl font-bold text-cyber-green">00:00</span>
+                    </div>
+                    <div class="bg-space-900 border border-gray-800 p-4 rounded-xl text-center">
+                        <span class="text-xs text-gray-400 block">DESAFIOS</span>
+                        <span id="report-challenges" class="text-2xl font-bold text-cyber-cyan">10/10</span>
+                    </div>
+                    <div class="bg-space-900 border border-gray-800 p-4 rounded-xl text-center">
+                        <span class="text-xs text-gray-400 block">DICAS USADAS</span>
+                        <span id="report-hints" class="text-2xl font-bold text-cyber-orange">0</span>
+                    </div>
+                </div>
+
+                <!-- Pedagogical Reflection Box -->
+                <div class="bg-space-900/80 border border-cyber-cyan/30 rounded-xl p-5 text-left space-y-3 font-sans">
+                    <h4 class="font-mono text-sm text-cyber-cyan font-bold uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-base"></i> Reflexão Pedagógica de IA & Dados:
+                    </h4>
+                    <p class="text-xs md:text-sm text-gray-300 leading-relaxed">
+                        Você acabou de aplicar <strong>variáveis, tipos de dados, operações matemáticas, precedência, comparações e lógica condicional (if/elif/else)</strong> para restaurar os algoritmos da NEXUS.
+                    </p>
+                    <p class="text-xs md:text-sm text-gray-300 leading-relaxed">
+                        <strong>Importante:</strong> Algoritmos baseados em regras fixas executam sequências exatas programadas por humanos. Em contraste, os modelos reais de <em>Machine Learning (Aprendizado de Máquina)</em> aprendem padrões ajustando parâmetros a partir do processamento de grandes volumes de dados de treino!
+                    </p>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex flex-col sm:flex-row justify-center gap-4 pt-2">
+                    <button onclick="generateCertificateCard()" class="px-6 py-3 rounded-xl font-mono font-bold bg-cyber-purple text-white hover:bg-purple-600 transition-all shadow-neon-purple flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-graduation-cap"></i> VER CERTIFICADO DE CONCLUSÃO
+                    </button>
+                    <button onclick="confirmResetGame()" class="px-6 py-3 rounded-xl font-mono font-bold bg-space-900 border border-gray-700 text-gray-300 hover:text-white hover:border-cyber-cyan transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> JOGAR NOVAMENTE
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="game.js"></script>
+</body>
+</html>

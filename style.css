@@ -1,0 +1,101 @@
+
+        /* Custom animations & CRT scanlines effect */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.8; transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6)); }
+            50% { opacity: 1; transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.9)); }
+        }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        .nexus-orb {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+        .scanline-overlay {
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 0, 0, 0.3) 50%,
+                rgba(0, 0, 0, 0.3)
+            );
+            background-size: 100% 4px;
+        }
+        .font-serif-cert {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        .font-cursive-cert {
+            font-family: 'Great Vibes', cursive;
+        }
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Print styling for exact Certificate export */
+        @page {
+            size: landscape;
+            margin: 0;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #modal-certificate, #modal-certificate * {
+                visibility: visible;
+            }
+            #modal-certificate {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100vw;
+                height: 100vh;
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .cert-print-area {
+                border: 10px double #b45309 !important;
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                height: 100% !important;
+                max-width: 100% !important;
+                padding: 2.5rem !important;
+                border-radius: 0 !important;
+                box-sizing: border-box !important;
+            }
+            .cert-print-area * {
+                color: #0f172a !important;
+            }
+            .cert-print-area .text-amber-300, 
+            .cert-print-area .text-amber-400,
+            .cert-print-area .text-yellow-200 {
+                color: #b45309 !important;
+            }
+            .cert-print-area .text-cyan-300,
+            .cert-print-area .text-cyan-400 {
+                color: #0284c7 !important;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #090d1f; }
+        ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; border: 1px solid #00f0ff33; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f0ff88; }
+    
+.music-volume { display:flex; align-items:center; gap:7px; color:#00f0ff; font-size:13px; }
+.music-volume input { width:85px; accent-color:#00f0ff; cursor:pointer; }
+@media(max-width:480px){ .music-volume input { width:55px; } }
+@media print { .music-volume { display:none!important; } }

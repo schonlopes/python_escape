@@ -1,0 +1,8 @@
+PYTHON ESCAPE — O CÓDIGO PERDIDO
+
+Abra index.html no Google Chrome.
+Mantenha todos os arquivos na mesma pasta.
+A trilha começa após o primeiro clique ou tecla, conforme as regras do navegador.
+Botão de áudio: liga/desliga música e efeitos. Controle ao lado: volume da música.
+O certificado original permanece incorporado ao HTML.
+Bibliotecas externas (Tailwind, Font Awesome, confetti e fontes) exigem conexão à internet.
