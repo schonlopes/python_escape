@@ -195,7 +195,7 @@
                 difficulty: 'FÁCIL',
                 xp: 100,
                 instruction: 'A NEXUS perdeu sua mensagem de inicialização. Analise o código Python e selecione a saída EXATA que será impressa no terminal.',
-                codeSnippet: 'nome = "NEXUS"\nversao = 2\n\nprint("Sistema:", nome)\nprint("Versão:", versao)',
+                codeSnippet: 'nome = "NEXUS"\nversao = 2\n\nprint("Sistema: ", nome)\nprint("Versão: ", versao)',
                 type: 'multiple-choice',
                 options: [
                     'Sistema: NEXUS\nVersão: 2',
