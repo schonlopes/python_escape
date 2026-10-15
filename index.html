@@ -15,6 +15,7 @@
 </head>
 <body class="bg-space-900 text-gray-100 font-sans min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-cyber-cyan selection:text-space-900">
 
+    <button id="teacher-entry" onclick="window.escapeCloud.openTeacher()" class="fixed bottom-4 right-4 z-50 rounded-xl border border-cyber-cyan/40 bg-space-800 px-4 py-2 text-xs font-mono text-cyber-cyan">ÁREA DO PROFESSOR</button>
     <audio id="game-soundtrack" src="controlled-tension.mp3" preload="auto" loop></audio>
     <header class="border-b border-cyber-cyan/30 bg-space-800/80 backdrop-blur-md sticky top-0 z-50 px-4 py-3 shadow-lg">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
@@ -417,6 +418,15 @@
         </section>
     </main>
 
+    <section id="teacher-panel" class="hidden fixed inset-0 z-[100] overflow-y-auto bg-space-900/95 p-4 md:p-10 text-white">
+      <div class="mx-auto max-w-6xl rounded-2xl border border-cyber-cyan/40 bg-space-800 p-5 md:p-8 space-y-5">
+        <div class="flex justify-between items-center"><h2 class="text-2xl font-bold text-cyber-cyan">PAINEL DO PROFESSOR</h2><button onclick="window.escapeCloud.closeTeacher()">✕ FECHAR</button></div>
+        <div id="teacher-login" class="space-y-3 max-w-md"><p class="text-sm text-gray-300">Entre com a conta docente cadastrada no Firebase Authentication.</p><input id="teacher-email" type="email" placeholder="E-mail do professor" class="w-full bg-space-900 border border-gray-600 p-3 rounded-lg"><input id="teacher-password" type="password" placeholder="Senha" class="w-full bg-space-900 border border-gray-600 p-3 rounded-lg"><button onclick="window.escapeCloud.login()" class="bg-cyber-cyan text-black font-bold px-5 py-3 rounded-lg">ENTRAR</button></div>
+        <div id="teacher-content" class="hidden space-y-5"><div class="flex flex-wrap gap-3"><button onclick="window.escapeCloud.showRanking()" class="border border-cyber-cyan p-3 rounded-lg">RANKING AO VIVO</button><button onclick="window.escapeCloud.showStats()" class="border border-cyber-purple p-3 rounded-lg">ESTATÍSTICAS</button><button onclick="window.escapeCloud.exportCSV()" class="border border-gray-500 p-3 rounded-lg">EXPORTAR CSV</button><button onclick="window.escapeCloud.logout()" class="border border-gray-500 p-3 rounded-lg">SAIR</button></div><div id="teacher-summary" class="text-sm text-gray-300"></div><div id="teacher-results" class="overflow-x-auto"></div><div class="border-t border-red-500/30 pt-5 flex flex-wrap gap-3"><button onclick="window.escapeCloud.clearRanking()" class="border border-red-400 text-red-300 p-3 rounded-lg">LIMPAR RANKING</button><button onclick="window.escapeCloud.clearDatabase()" class="bg-red-700 p-3 rounded-lg">APAGAR TODOS OS DADOS</button></div></div>
+        <p id="teacher-message" class="text-sm text-yellow-300" role="status"></p>
+      </div>
+    </section>
+    <script type="module" src="cloud.js"></script>
     <script src="game.js"></script>
 </body>
 </html>

@@ -1114,6 +1114,7 @@
         function triggerVictoryReport() {
             gameState.timerActive = false;
             saveGame();
+            window.escapeCloud?.submitCompletion(gameState);
 
             document.getElementById('report-operator-name').innerText = gameState.operator;
             document.getElementById('report-xp').innerText = gameState.xp;

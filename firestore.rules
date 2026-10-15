@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  match /conclusions/{id} {
+   // Substitua pelo UID do usuário professor, obtido em Authentication > Users.
+   function isTeacher() { return request.auth != null && request.auth.uid == 'SUBSTITUIR_UID_PROFESSOR'; }
+   allow read, delete: if isTeacher();
+   allow create: if request.auth != null && request.auth.token.firebase.sign_in_provider == 'anonymous'
+     && request.resource.data.keys().hasOnly(['name','xp','timeSeconds','completed','hints','attempts','createdAt','uid'])
+     && request.resource.data.uid == request.auth.uid
+     && request.resource.data.name is string && request.resource.data.name.size() <= 80
+     && request.resource.data.xp is number && request.resource.data.xp >= 0 && request.resource.data.xp <= 5000
+     && request.resource.data.timeSeconds is number && request.resource.data.timeSeconds >= 0
+     && request.resource.data.completed == 10
+     && request.resource.data.hints is number && request.resource.data.hints >= 0
+     && request.resource.data.attempts is number && request.resource.data.attempts >= 0
+     && request.resource.data.createdAt == request.time;
+   allow update: if false;
+  }
+ }
+}
